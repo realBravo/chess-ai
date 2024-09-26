@@ -20,6 +20,10 @@ class gamestate():
         self.pins = []
         self.checks = []
         self.enpassant_possible = ()
+
+        self.current_castling_rights = castle_rights(True, True, True, True)
+        self.castle_right_logs = [castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
+                                                self.current_castling_rights.wqs, self.current_castling_rights.bqs)]
     
     def make_move(self, move):
         self.board[move.start_row][move.start_col] = "--"
@@ -42,7 +46,12 @@ class gamestate():
             self.enpassant_possible = ((move.start_row + move.end_row) // 2, move.start_col)
         else:
             self.enpassant_possible = ()
-
+        
+        
+        # castling rights
+        self.update_castling_rights(move)
+        self.castle_right_logs.append(castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
+                                                self.current_castling_rights.wqs, self.current_castling_rights.bqs))
 
     def undo_move(self):
         if len(self.move_log) != 0:
@@ -62,6 +71,29 @@ class gamestate():
             if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_row) == 2:
                 self.enpassant_possible = ()
 
+            # undo castling rights
+            self.castle_right_logs.pop()
+            self.current_castling_rights = self.castle_right_logs[-1]
+    def update_castling_rights(self, move):
+        if move.piece_moved == "wK":
+            self.current_castling_rights.wks = False
+            self.current_castling_rights.wqs = False
+        elif move.piece_moved == "bK":
+            self.current_castling_rights.bks = False
+            self.current_castling_rights.bqs = False
+        elif move.piece_moved == 'wR':
+            if move.start_row == 7:
+                if move.start_col == 0:
+                    self.current_castling_rights.wqs = False
+                elif move.start_col == 7:
+                    self.current_castling_rights.wks = False
+        elif move.piece_moved == "bR":
+            if move.start_row == 0:
+                if move.start_col == 0:
+                    self.current_castling_rights.bqs = False
+                elif move.start_col == 7:
+                    self.current_castling_rights.bks = False
+        
     # TODO: fix function
     def get_valid_moves(self):
         temp_enpassant_possible = self.enpassant_possible
@@ -337,13 +369,22 @@ class gamestate():
                         self.white_king_location = (r, c)
                     else:
                         self.black_king_location = (r, c)
+
+class castle_rights():
+    def __init__(self, wks, bks, wqs, bqs):
+        self.wks = wks
+        self.bks = bks
+        self.wqs = wqs
+        self.bqs = bqs
+
+        
 class Move():
     ransk_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
     rows_to_ransk = {v: k for k, v in ransk_to_rows.items()}
     files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
     cols_to_files = {v: k for k, v in files_to_cols.items()}
 
-    def __init__(self, start_sq, end_sq, board, is_enpassant_move = False):
+    def __init__(self, start_sq, end_sq, board, is_enpassant = False):
         self.start_row = start_sq[0]
         self.start_col = start_sq[1]
         self.end_row = end_sq[0]
@@ -352,7 +393,7 @@ class Move():
         self.pice_captured = board[self.end_row][self.end_col]
         self.is_pawn_promotion = (self.piece_moved == 'wP' and self.end_row == 0) or (self.piece_moved == 'bP' and self.end_row == 7)
         self.is_enpassant_move = False
-        self.is_enpassant_move = is_enpassant_move
+        self.is_enpassant_move = is_enpassant
         if self.is_enpassant_move:
             self.pice_captured = 'wP' if self.piece_moved == 'bP' else 'bP'
         self.move_ID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
