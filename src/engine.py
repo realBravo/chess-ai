@@ -47,7 +47,14 @@ class gamestate():
         else:
             self.enpassant_possible = ()
         
-        
+        if move.is_castle_move:
+            if move.end_col - move.start_col == 2:
+                self.board[move.end_row][move.end_col - 1] = self.board[move.end_row][move.end_col + 1]
+                self.board[move.end_row][move.end_col + 1] = "--"
+            else:
+                self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 2]
+                self.board[move.end_row][move.end_col - 2] = "--"
+
         # castling rights
         self.update_castling_rights(move)
         self.castle_right_logs.append(castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
@@ -75,6 +82,14 @@ class gamestate():
             self.castle_right_logs.pop()
             self.current_castling_rights = self.castle_right_logs[-1]
 
+            if move.is_castle_move:
+                if move.end_col - move.start_col == 2:
+                    self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 1]
+                    self.board[move.end_row][move.end_col - 1] = "--"
+                else:
+                    self.board[move.end_row][move.end_col - 2] = self.board[move.end_row][move.end_col + 1]
+                    self.board[move.end_row][move.end_col + 1] = "--"
+
     def update_castling_rights(self, move):
         if move.piece_moved == "wK":
             self.current_castling_rights.wks = False
@@ -97,8 +112,18 @@ class gamestate():
         
     # TODO: fix function
     def get_valid_moves(self):
+        for log in self.castle_right_logs:
+            print(log.wks, log.wqs, log.bks, log.bqs, end = " ")
+        print()
         temp_enpassant_possible = self.enpassant_possible
+        temp_castle_rights = castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
+                                           self.current_castling_rights.wqs, self.current_castling_rights.bqs)
         moves = []
+        if self.white_to_move:
+            self.get_castle_moves(self.white_king_location[0], self.white_king_location[1], moves, ally_color = 'w')
+        else:
+            self.get_castle_moves(self.black_king_location[0], self.black_king_location[1], moves, ally_color = 'b')
+
         self.is_in_check, self.pins, self.checks = self.check_for_pins_and_checks()
         if self.white_to_move:
             king_row = self.white_king_location[0]
@@ -132,7 +157,7 @@ class gamestate():
                 self.get_king_moves(king_row, king_col, moves)
         else:
             moves = self.get_all_possible_moves()
-        
+        self.current_castling_rights = temp_castle_rights 
         return moves
 
     def in_check(self):
@@ -370,9 +395,8 @@ class gamestate():
                         self.white_king_location = (r, c)
                     else:
                         self.black_king_location = (r, c)
-        self.get_castle_moves(r, c, moves, ally_color)
     def get_castle_moves(self, r, c, moves, ally_color):
-        if self.in_check():
+        if self.square_under_attack(r, c):
             return 
         if (self.white_to_move and self.current_castling_rights.wks) or (not self.white_to_move and self.current_castling_rights.bks):
             self.get_kingside_castle_moves(r, c, moves, ally_color)
@@ -384,7 +408,7 @@ class gamestate():
     def get_kingside_castle_moves(self, r, c, moves, ally_color):
         if self.board[r][c + 1] == "--" and self.board[r][c + 2] == "--":
             if not self.square_under_attack(r, c + 1) and not self.square_under_attack(r, c + 2):
-                moves.append(Move((r, c), (r, c + 2), self.board), is_castle_move = True)
+                moves.append(Move((r, c), (r, c + 2), self.board, is_castle_move = True))
     def get_queenside_castle_moves(self, r, c, moves, ally_color):
         if self.board[r][c - 1] == "--" and self.board[r][c - 2] == "--" and self.board[r][c - 3]:
             if not self.square_under_attack(r, c - 1) and not self.square_under_attack(r, c - 2):
