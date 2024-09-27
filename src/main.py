@@ -58,13 +58,28 @@ def main():
         if move_made:
             valid_moves = gs.get_valid_moves()
             move_made = False
-        draw_game_state(screen, gs)
+        draw_game_state(screen, gs, valid_moves, sq_selected)
         clock.tick(MAX_FPS)
         pygame.display.flip()
 
-def draw_game_state(screen, gs):
+def highlight_square(screen, gs, valid_moves, sq_selected):
+    if sq_selected != "--":
+        r, c = sq_selected
+        if gs.board[r][c] == ('w' if gs.white_to_move else 'b'):
+            s = pygame.Surface((SQ_SIZE, SQ_SIZE))
+            s.set_alpha(100)
+            s.fill(pygame.Color('blue'))
+            screen.blit(s, (c * SQ_SIZE, r * SQ_SIZE))
+            s.fill(pygame.Color('green'))
+            for move in valid_moves:
+                if move.start_row == r and move.start_col == c:
+                    screen.blit(s, (move.end_row * SQ_SIZE, move.end_col * SQ_SIZE))
+
+def draw_game_state(screen, gs, valid_moves, sq_selected):
     draw_board(screen)
+    highlight_square(screen, gs, valid_moves, sq_selected)
     draw_pieces(screen, gs.board)
+
 
 def draw_board(screen):
     colors = [pygame.Color('white'), pygame.Color('gray')]
