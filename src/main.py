@@ -27,8 +27,6 @@ def main():
     sq_selected = ()
     player_clicks = []
     game_over = False
-    amove_log = gs.move_log
-    print(amove_log)
     while running:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -89,7 +87,7 @@ def main():
 
         clock.tick(MAX_FPS)
         pygame.display.flip()
-
+# TODO: fix bug where wrong squares are highlighted
 def highlight_square(screen, gs, valid_moves, sq_selected):
     if sq_selected != ():
         r, c = sq_selected
@@ -101,7 +99,7 @@ def highlight_square(screen, gs, valid_moves, sq_selected):
             s.fill(pygame.Color('green'))
             for move in valid_moves:
                 if move.start_row == r and move.start_col == c:
-                    screen.blit(s, (move.end_row * SQ_SIZE, move.end_col * SQ_SIZE))
+                    screen.blit(s, (move.end_col * SQ_SIZE, move.end_row * SQ_SIZE))
 
 def draw_game_state(screen, gs, valid_moves, sq_selected):
     draw_board(screen)

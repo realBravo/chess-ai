@@ -40,9 +40,9 @@ class gamestate():
 
         # is_enpassant move
         if move.is_enpassant_move:
-            self.board[move.end_row][move.end_col] = '--'
+            self.board[move.start_row][move.end_col] = '--'
 
-        if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_col) == 2:
+        if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_row) == 2:
             self.enpassant_possible = ((move.start_row + move.end_row) // 2, move.start_col)
         else:
             self.enpassant_possible = ()
@@ -74,7 +74,7 @@ class gamestate():
 
             if move.is_enpassant_move:
                 self.board[move.end_row][move.end_col] = '--'
-                self.board[move.start_row][move.start_col] = move.piece_captured
+                self.board[move.start_row][move.end_col] = move.piece_captured
                 self.enpassant_possible = (move.end_row, move.end_col)
 
             if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_row) == 2:
@@ -112,11 +112,11 @@ class gamestate():
                     self.current_castling_rights.bqs = False
                 elif move.start_col == 7:
                     self.current_castling_rights.bks = False
-        
+    # TODO: fix bug where checks are not being accounted for         
     def get_valid_moves(self):
         temp_enpassant_possible = self.enpassant_possible
         temp_castle_rights = castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
-                                           self.current_castling_rights.bks, self.current_castling_rights.bqs)
+                                           self.current_castling_rights.wqs, self.current_castling_rights.bqs)
 
         moves = self.get_all_possible_moves()
 
@@ -133,6 +133,8 @@ class gamestate():
         if len(moves) == 0:
             if self.in_check():
                 self.checkmate = True
+            else:
+                self.stalemate = True
 
         if self.white_to_move:
             self.get_castle_moves(self.white_king_location[0], self.white_king_location[1], moves)
@@ -146,7 +148,8 @@ class gamestate():
     def in_check(self):
         if self.white_to_move:
             return self.square_under_attack(self.white_king_location[0], self.white_king_location[1])
-        return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])
+        else:
+            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])
 
     def square_under_attack(self, r, c):
         self.white_to_move = not self.white_to_move
@@ -173,11 +176,11 @@ class gamestate():
                 moves.append(Move((r, c), (r - 1, c), self.board))
                 if r == 6 and self.board[r - 2][c] == "--":
                     moves.append(Move((r, c), (r - 2, c), self.board))
-            if c - 1 > 0:
+            if c - 1 >= 0:
                 if self.board[r - 1][c - 1][0] == 'b':
                     moves.append(Move((r, c), (r - 1, c - 1), self.board))
                 elif (r - 1, c - 1) == self.enpassant_possible:
-                    moves.append(Move((r, c), (r - 1, c - 1), self.board, is_enpassant_move= True))
+                    moves.append(Move((r, c), (r - 1, c - 1), self.board, is_enpassant_move = True))
             if c + 1 <= 7:
                 if self.board[r - 1][c + 1][0] == 'b':
                     moves.append(Move((r, c), (r - 1, c + 1), self.board))
@@ -192,8 +195,8 @@ class gamestate():
             if c - 1 >= 0:
                 if self.board[r + 1][c - 1][0] == 'w':
                     moves.append(Move((r, c), (r + 1, c - 1), self.board))
-                elif (r - 1, c - 1) == self.enpassant_possible:
-                    moves.append(Move((r, c), (r - 1, c - 1), self.board, is_enpassant_move = True))
+                elif (r + 1, c - 1) == self.enpassant_possible:
+                    moves.append(Move((r, c), (r + 1, c - 1), self.board, is_enpassant_move = True))
             if c + 1 <= 7:
                 if self.board[r + 1][c + 1][0] == 'w':
                     moves.append(Move((r, c), (r + 1, c + 1), self.board))
@@ -220,7 +223,7 @@ class gamestate():
                     break
 
     def get_knight_moves(self, r, c, moves):
-        knight_moves = ((-2, -1), (-2, 1), (-1, -2), (-1, -2), (1, -2), (1, 2), (2, -1), (2, 1))
+        knight_moves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
         ally_color = 'w' if self.white_to_move else 'b'
         for m in knight_moves:
             end_row = r + m[0]
@@ -237,7 +240,7 @@ class gamestate():
             for i in range(1, 8):
                 end_row = r + d[0] * i
                 end_col = c + d[1] * i
-                if 0 < end_row < 8 and 0 <= end_col < 8:
+                if 0 <= end_row < 8 and 0 <= end_col < 8:
                     end_piece = self.board[end_row][end_col]
                     if end_piece == '--':
                         moves.append(Move((r, c), (end_row, end_col), self.board))
@@ -292,9 +295,11 @@ class castle_rights():
 
         
 class Move():
-    ranks_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
+    ranks_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4,
+                     "5": 3, "6": 2, "7": 1, "8": 0}
     rows_to_ranks = {v: k for k, v in ranks_to_rows.items()}
-    files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
+    files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3,
+                     "e": 4, "f": 5, "g": 6, "h": 7}
     cols_to_files = {v: k for k, v in files_to_cols.items()}
 
     def __init__(self, start_sq, end_sq, board, is_enpassant_move = False, is_castle_move = False):
