@@ -1,5 +1,6 @@
 import pygame
 import engine
+import ai
 
 WIDTH = HEIGHT = 512
 DIMENSIONS = 8
@@ -27,12 +28,15 @@ def main():
     sq_selected = ()
     player_clicks = []
     game_over = False
+    player_one = False # if humans is playing this will be true if not it will be false
+    player_two = False # same above but for black
     while running:
+        human_turn = (gs.white_to_move and player_one) or (not gs.white_to_move and player_two)
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
             elif e.type == pygame.MOUSEBUTTONDOWN:
-                if not game_over:
+                if not game_over and human_turn:
                     location = pygame.mouse.get_pos()
                     row = location[1] // SQ_SIZE
                     col = location[0] // SQ_SIZE
@@ -66,6 +70,13 @@ def main():
                     player_clicks = []
                     move_made = False
                     animate = False
+        # AI move finder
+        if not game_over and not human_turn:
+            AI_Move = ai.find_random_move(valid_moves)
+            gs.make_move(AI_Move)
+            move_made = True
+            animate = True
+
         if move_made:
             if animate:
                 animate_move(gs.move_log[-1], screen, gs.board, clock)
