@@ -72,7 +72,9 @@ def main():
                     animate = False
         # AI move finder
         if not game_over and not human_turn:
-            AI_Move = ai.find_random_move(valid_moves)
+            AI_Move = ai.find_best_move_min_max(gs, valid_moves)
+            if AI_Move is None:
+                AI_Move = ai.find_random_move(valid_moves)
             gs.make_move(AI_Move)
             move_made = True
             animate = True

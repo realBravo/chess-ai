@@ -93,6 +93,9 @@ class gamestate():
                     self.board[move.end_row][move.end_col - 2] = self.board[move.end_row][move.end_col + 1]
                     self.board[move.end_row][move.end_col + 1] = "--"
 
+            self.checkmate = False
+            self.stalemate = False
+
     def update_castling_rights(self, move):
         if move.piece_moved == "wK":
             self.current_castling_rights.wks = False
