@@ -123,6 +123,7 @@ def draw_pieces(screen, board):
             piece = board[row][col]
             if piece != '--':
                 screen.blit(IMAGES[piece], pygame.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
 def animate_move(move, screen, board, clock):
     global colors
     dR = move.end_row - move.start_row

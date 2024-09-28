@@ -64,7 +64,7 @@ class gamestate():
         if len(self.move_log) != 0:
             move = self.move_log.pop()
             self.board[move.start_row][move.start_col] = move.piece_moved
-            self.board[move.end_row][move.end_col] = move.pice_captured
+            self.board[move.end_row][move.end_col] = move.piece_captured
             self.white_to_move = not self.white_to_move
 
             if move.piece_moved == 'wK':
@@ -74,7 +74,7 @@ class gamestate():
 
             if move.is_enpassant_move:
                 self.board[move.end_row][move.end_col] = '--'
-                self.board[move.start_row][move.start_col] = move.pice_captured
+                self.board[move.start_row][move.start_col] = move.piece_captured
                 self.enpassant_possible = (move.end_row, move.end_col)
 
             if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_row) == 2:
@@ -124,8 +124,8 @@ class gamestate():
             self.make_move(moves[i])
             self.white_to_move = not self.white_to_move
             
-            if not self.in_check():
-               moves.remove(moves[i])
+            if self.in_check():
+                moves.remove(moves[i])
 
             self.white_to_move = not self.white_to_move
             self.undo_move()
@@ -303,13 +303,13 @@ class Move():
         self.end_row = end_sq[0]
         self.end_col = end_sq[1]
         self.piece_moved = board[self.start_row][self.start_col]
-        self.pice_captured = board[self.end_row][self.end_col]
+        self.piece_captured = board[self.end_row][self.end_col]
        
         self.is_pawn_promotion = (self.piece_moved == 'wP' and self.end_row == 0) or (self.piece_moved == 'bP' and self.end_row == 7)
         
         self.is_enpassant_move = is_enpassant_move
         if self.is_enpassant_move:
-            self.pice_captured = 'wP' if self.piece_moved == 'bP' else 'bP'
+            self.piece_captured = 'wP' if self.piece_moved == 'bP' else 'bP'
        
         self.is_castle_move = is_castle_move
 
