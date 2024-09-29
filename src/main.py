@@ -2,6 +2,7 @@ import pygame
 import engine
 import ai
 
+
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 170
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
