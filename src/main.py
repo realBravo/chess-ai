@@ -32,8 +32,8 @@ def main():
     sq_selected = ()
     player_clicks = []
     game_over = False
-    player_one = True # if humans is playing this will be true if not it will be false
-    player_two = True # same above but for black
+    player_one = False # if humans is playing this will be true if not it will be false
+    player_two = False # same above but for black
     while running:
         human_turn = (gs.white_to_move and player_one) or (not gs.white_to_move and player_two)
         for e in pygame.event.get():
@@ -185,7 +185,7 @@ def animate_move(move, screen, board, clock):
         clock.tick()
 
 def draw_endgame_text(screen, text):
-    font = pygame.font.SysFont("Helvitca", 32, True, False)
+    font = pygame.font.SysFont("Arial", 32, True, False)
     text_object = font.render(text, 0, pygame.Color('Gray'))
     text_location = pygame.Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH / 2 - text_object.get_width() / 2, BOARD_HEIGHT / 2 - text_object.get_height() / 2)
     text_object = font.render(text, 0, pygame.Color('Black'))
