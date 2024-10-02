@@ -74,6 +74,7 @@ def main():
                     player_clicks = []
                     move_made = False
                     animate = False
+                    game_over = False
         # AI move finder
         if not game_over and not human_turn:
             AI_Move = ai.find_best_move(gs, valid_moves)
