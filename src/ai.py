@@ -13,17 +13,22 @@ def find_best_move_min_max(gs, valid_moves):
     turn_multi = 1 if gs.white_to_move else -1
     max_score = -CHECKMATE 
     best_move = None
+
     for player_move in valid_moves:
         gs.make_move(player_move)
+
         if gs.checkmate:
             score = CHECKMATE
         elif gs.stalemate:
             score = STALEMATE
+
         score = turn_multi * score_material(gs.board)
         if score > max_score:
             max_score = score
             best_move = player_move
+
         gs.undo_move()
+
     return best_move
 
 """
@@ -34,9 +39,12 @@ def find_best_move(gs, valid_moves):
     counter = 0
     next_move = None
     random.shuffle(valid_moves)
+
     # find_move_min_max(gs, valid_moves, DEPTH, gs.white_to_move)
     find_move_nega_max_alpha_beta(gs, valid_moves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.white_to_move else -1)
+
     print("moves evaulated: ", counter)
+
     return next_move
 
 def find_move_min_max(gs, valid_moves, depth, white_to_move):
@@ -49,24 +57,31 @@ def find_move_min_max(gs, valid_moves, depth, white_to_move):
         for move in valid_moves:
             gs.make_move(move)
             next_moves = gs.get_valid_moves()
+
             score = find_move_min_max(gs,next_moves, depth - 1, False)
             if score > max_score:
                 max_score = score
                 if depth == DEPTH:
                     next_move = move
+
             gs.undo_move()
+
         return max_score
     else:
         min_score = CHECKMATE
+
         for move in valid_moves:
             gs.make_move(move)
             next_moves = gs.get_valid_moves()
             score = find_move_min_max(gs, next_moves, depth - 1, True)
+
             if score < min_score:
                 min_score = score
                 if depth == DEPTH:
                     next_move = move
+
             gs.undo_move()
+
         return min_score
 
 def find_move_nega_max(gs, valid_moves, depth, turn_multi):
@@ -75,14 +90,17 @@ def find_move_nega_max(gs, valid_moves, depth, turn_multi):
         return turn_multi * score_board(gs)
 
     max_score = -CHECKMATE
+
     for move in valid_moves:
         gs.make_move(move)
         next_moves = gs.get_valid_moves()
+
         score = -find_move_nega_max(gs, next_moves, depth -1, -turn_multi)
         if score > max_score:
             max_score = score
             if depth == DEPTH:
                 next_move = move
+                
         gs.undo_move()
 
     return max_score
@@ -90,19 +108,25 @@ def find_move_nega_max(gs, valid_moves, depth, turn_multi):
 def find_move_nega_max_alpha_beta(gs, valid_moves, depth, alpha, beta, turn_multi):
     global next_move, counter
     counter += 1
+
     if depth == 0:
         return turn_multi * score_board(gs)
 
     max_score = -CHECKMATE
+
     for move in valid_moves:
         gs.make_move(move)
         next_moves = gs.get_valid_moves()
+
         score = -find_move_nega_max_alpha_beta(gs, next_moves, depth -1, -beta, -alpha, -turn_multi)
+
         if score > max_score:
             max_score = score
             if depth == DEPTH:
                 next_move = move
+
         gs.undo_move()
+        
         if max_score > alpha:
             alpha = max_score
         if alpha >= beta:
@@ -127,6 +151,7 @@ def score_board(gs):
                 score += piece_score[square[1]]
             elif square[0] == 'b':
                 score -= piece_score[square[1]]
+
     return score
 
 """

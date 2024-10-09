@@ -58,6 +58,7 @@ class gamestate():
 
         # enpassant_possible log
         self.enpassant_possible_log.append(self.enpassant_possible)
+
         # castling rights
         self.update_castling_rights(move)
         self.castle_right_logs.append(castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
@@ -81,6 +82,7 @@ class gamestate():
 
             self.enpassant_possible_log.pop()
             self.enpassant_possible = self.enpassant_possible_log[-1]
+
             # undo castling rights
             self.castle_right_logs.pop()
             new_rights = self.castle_right_logs[-1]
@@ -101,19 +103,24 @@ class gamestate():
         if move.piece_moved == "wK":
             self.current_castling_rights.wks = False
             self.current_castling_rights.wqs = False
+
         elif move.piece_moved == "bK":
             self.current_castling_rights.bks = False
             self.current_castling_rights.bqs = False
+
         elif move.piece_moved == 'wR':
             if move.start_row == 7:
                 if move.start_col == 0:
                     self.current_castling_rights.wqs = False
+
                 elif move.start_col == 7:
                     self.current_castling_rights.wks = False
+
         elif move.piece_moved == "bR":
             if move.start_row == 0:
                 if move.start_col == 0:
                     self.current_castling_rights.bqs = False
+
                 elif move.start_col == 7:
                     self.current_castling_rights.bks = False
 
@@ -121,14 +128,18 @@ class gamestate():
             if move.end_row == 7:
                 if move.end_col == 0:
                     self.current_castling_rights.wqs = False
+
                 elif move.end_col == 7:
                     self.current_castling_rights.wks = False
+
         elif move.piece_captured == 'bR':
             if move.end_row == 0:
                 if move.end_col == 0:
                     self.current_castling_rights.bqs = False
+
                 elif move.end_col == 7:
                     self.current_castling_rights.bks = False
+
 
     def get_valid_moves(self):
         temp_enpassant_possible = self.enpassant_possible
@@ -172,9 +183,11 @@ class gamestate():
         self.white_to_move = not self.white_to_move
         opp_moves = self.get_all_possible_moves()
         self.white_to_move = not self.white_to_move
+
         for move in opp_moves:
             if move.end_row == r and move.end_col == c:
                 return True
+
         return False
 
     def get_all_possible_moves(self):
@@ -185,6 +198,7 @@ class gamestate():
                 if (turn == 'w' and self.white_to_move) or (turn == 'b' and not self.white_to_move):
                     piece = self.board[r][c][1]
                     self.move_functions[piece](r, c, moves)
+
         return moves
 
     def get_pawn_moves(self, r, c, moves):
@@ -193,11 +207,13 @@ class gamestate():
                 moves.append(Move((r, c), (r - 1, c), self.board))
                 if r == 6 and self.board[r - 2][c] == "--":
                     moves.append(Move((r, c), (r - 2, c), self.board))
+
             if c - 1 >= 0:
                 if self.board[r - 1][c - 1][0] == 'b':
                     moves.append(Move((r, c), (r - 1, c - 1), self.board))
                 elif (r - 1, c - 1) == self.enpassant_possible:
                     moves.append(Move((r, c), (r - 1, c - 1), self.board, is_enpassant_move = True))
+
             if c + 1 <= 7:
                 if self.board[r - 1][c + 1][0] == 'b':
                     moves.append(Move((r, c), (r - 1, c + 1), self.board))
@@ -209,11 +225,13 @@ class gamestate():
                 moves.append(Move((r, c), (r + 1, c), self.board))
                 if r == 1 and self.board[r + 2][c] == "--":
                     moves.append(Move((r, c), (r + 2, c), self.board))
+
             if c - 1 >= 0:
                 if self.board[r + 1][c - 1][0] == 'w':
                     moves.append(Move((r, c), (r + 1, c - 1), self.board))
                 elif (r + 1, c - 1) == self.enpassant_possible:
                     moves.append(Move((r, c), (r + 1, c - 1), self.board, is_enpassant_move = True))
+
             if c + 1 <= 7:
                 if self.board[r + 1][c + 1][0] == 'w':
                     moves.append(Move((r, c), (r + 1, c + 1), self.board))
@@ -223,6 +241,7 @@ class gamestate():
     def get_rook_moves(self, r, c, moves):
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1)) 
         enemy_color = 'b' if self.white_to_move else 'w'
+
         for d in directions:
             for i in range(1, 8):
                 end_row = r + d[0] * i
@@ -242,6 +261,7 @@ class gamestate():
     def get_knight_moves(self, r, c, moves):
         knight_moves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
         ally_color = 'w' if self.white_to_move else 'b'
+
         for m in knight_moves:
             end_row = r + m[0]
             end_col = c + m[1]
@@ -253,6 +273,7 @@ class gamestate():
     def get_bishop_moves(self,r, c, moves):
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1)) 
         enemy_color = 'b' if self.white_to_move else 'w'
+
         for d in directions:
             for i in range(1, 8):
                 end_row = r + d[0] * i
@@ -276,6 +297,7 @@ class gamestate():
     def get_king_moves(self, r, c, moves):
         king_moves = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
         ally_color = 'w' if self.white_to_move else 'b'
+
         for i in range(8):
             end_row = r + king_moves[i][0]
             end_col = c + king_moves[i][1]
@@ -287,6 +309,7 @@ class gamestate():
     def get_castle_moves(self, r, c, moves):
         if self.square_under_attack(r, c):
             return 
+
         if (self.white_to_move and self.current_castling_rights.wks) or (not self.white_to_move and self.current_castling_rights.bks):
             self.get_kingside_castle_moves(r, c, moves)
 

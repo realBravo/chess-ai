@@ -80,6 +80,7 @@ def main():
             AI_Move = ai.find_best_move(gs, valid_moves)
             if AI_Move is None:
                 AI_Move = ai.find_random_move(valid_moves)
+
             gs.make_move(AI_Move)
             move_made = True
             animate = True
@@ -87,6 +88,7 @@ def main():
         if move_made:
             if animate:
                 animate_move(gs.move_log[-1], screen, gs.board, clock)
+
             valid_moves = gs.get_valid_moves()
             move_made = False
             animate = False
@@ -104,6 +106,7 @@ def main():
 def highlight_square(screen, gs, valid_moves, sq_selected):
     if sq_selected != ():
         r, c = sq_selected
+
         if gs.board[r][c][0] == ('w' if gs.white_to_move else 'b'):
             s = pygame.Surface((SQ_SIZE, SQ_SIZE))
             s.set_alpha(100)
@@ -141,20 +144,26 @@ def draw_move_log(screen, gs, font):
     pygame.draw.rect(screen, pygame.Color('black'), move_log_rect)
     move_log = gs.move_log
     move_texts = []
+
     for i in range(0, len(move_log), 2):
         move_string = str(i // 2 + 1) + ". " + str(move_log[i]) + " "
+
         if i + 1 < len(move_log):
             move_string += str(move_log[i + 1]) + " "
+
         move_texts.append(move_string)
+
     moves_per_row = 2
     padding = 5
     text_y = padding
     line_spacing = 2
+
     for i in range(0, len(move_texts), moves_per_row):
         text = ""
         for j in range(moves_per_row):
             if i + j < len(move_texts):
                 text += move_texts[i + j]
+
         text_object = font.render(text, True, pygame.Color('Gray'))
         text_location = move_log_rect.move(padding, text_y)
         screen.blit(text_object, text_location.move(2, 2))
@@ -166,6 +175,7 @@ def animate_move(move, screen, board, clock):
     dC = move.end_col - move.start_col
     frame_per_square = 10
     frame_count = (abs(dR) + abs(dC)) * frame_per_square
+
     for frame in range(frame_count + 1):
         r, c = (move.start_row + dR * frame / frame_count, move.start_col + dC * frame / frame_count)
         draw_board(screen)
@@ -179,6 +189,7 @@ def animate_move(move, screen, board, clock):
             if move.is_enpassant_move:
                 enpassant_row = move.end_row + 1 if move.piece_captured[0] == 'b' else move.end_row - 1
                 end_square = pygame.Rect(move.end_col * SQ_SIZE, enpassant_row * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+
             screen.blit(IMAGES[move.piece_captured], end_square)
 
         screen.blit(IMAGES[move.piece_moved], pygame.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
