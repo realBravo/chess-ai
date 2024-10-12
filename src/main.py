@@ -8,7 +8,7 @@ MOVE_LOG_PANEL_WIDTH = 170
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSIONS = 8
 SQ_SIZE = BOARD_HEIGHT // DIMENSIONS
-MAX_FPS = 15
+MAX_FPS = 30
 IMAGES = {}
 
 def load_images():
@@ -75,6 +75,7 @@ def main():
                     move_made = False
                     animate = False
                     game_over = False
+
         # AI move finder
         if not game_over and not human_turn:
             AI_Move = ai.find_best_move(gs, valid_moves)
