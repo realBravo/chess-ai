@@ -10,16 +10,23 @@ class gamestate():
             ['wP', 'wP', 'wP', 'wP', 'wP',  'wP', 'wP', 'wP'],
             ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']
         ]
+
         self.move_functions = {'P': self.get_pawn_moves, 'R': self.get_rook_moves, 'N': self.get_knight_moves,
                                'B': self.get_bishop_moves, 'Q': self.get_queen_moves, 'K': self.get_king_moves}
-        self.white_to_move = True
+
         self.move_log = []
+
+        self.white_to_move = True
+
         self.white_king_location = (7, 4)
         self.black_king_location = (0, 4)
+
         self.checkmate = False
         self.stalemate = False
+
         self.enpassant_possible = ()
         self.enpassant_possible_log = [self.enpassant_possible]
+
         self.current_castling_rights = castle_rights(True, True, True, True)
         self.castle_right_logs = [castle_rights(self.current_castling_rights.wks, self.current_castling_rights.bks,
                                                 self.current_castling_rights.wqs, self.current_castling_rights.bqs)]

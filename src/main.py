@@ -4,7 +4,7 @@ import ai
 
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
-MOVE_LOG_PANEL_WIDTH = 170
+MOVE_LOG_PANEL_WIDTH = 200
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSIONS = 8
 SQ_SIZE = BOARD_HEIGHT // DIMENSIONS
@@ -21,7 +21,7 @@ def main():
     pygame.display.set_caption('Chess-ai')
     screen = pygame.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT))
     clock = pygame.time.Clock()
-    screen.fill(pygame.Color('white'))
+    screen.fill(pygame.Color('black'))
     move_log_font = pygame.font.SysFont("Arial", 18, True, False)
     gs = engine.gamestate()
     valid_moves = gs.get_valid_moves()
@@ -42,7 +42,6 @@ def main():
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 if not game_over and human_turn:
                     location = pygame.mouse.get_pos()
-                    print(location)
                     row = location[1] // SQ_SIZE
                     col = location[0] // SQ_SIZE
                     if sq_selected == (row, col) or col >= 8:
@@ -61,6 +60,7 @@ def main():
                                 animate = True
                                 sq_selected = ()
                                 player_clicks = []
+                                print("hello there")
                         if not move_made:
                             player_clicks = [sq_selected]
                 # key handler
@@ -96,6 +96,17 @@ def main():
                     game_over = False
                     player_two = True
                     player_one = False
+                elif e.key == pygame.K_a:
+                    gs = engine.gamestate()
+                    valid_moves = gs.get_valid_moves()
+                    sq_selected = ()
+                    player_clicks = []
+                    move_made = False
+                    animate = False
+                    game_over = False
+                    player_two = False
+                    player_one = False
+
         # AI move finder
         if not game_over and not human_turn:
             AI_Move = ai.find_best_move(gs, valid_moves)
@@ -160,6 +171,7 @@ def draw_pieces(screen, board):
             if piece != '--':
                 screen.blit(IMAGES[piece], pygame.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
+# TODO: fix reseting move log to empty
 def draw_move_log(screen, gs, font):
     move_log_rect = pygame.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
     pygame.draw.rect(screen, pygame.Color('black'), move_log_rect)
@@ -189,6 +201,12 @@ def draw_move_log(screen, gs, font):
         text_location = move_log_rect.move(padding, text_y)
         screen.blit(text_object, text_location.move(2, 2))
         text_y += text_object.get_height() + line_spacing
+
+    # reset move log hack
+   # if len(move_log) > 10:
+   #     move_log = []
+   #     pygame.draw.rect(screen, pygame.Color('black'), move_log_rect)
+   #     print(len(move_log))
 
 def animate_move(move, screen, board, clock):
     global colors
