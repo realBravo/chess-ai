@@ -42,6 +42,7 @@ def main():
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 if not game_over and human_turn:
                     location = pygame.mouse.get_pos()
+                    print(location)
                     row = location[1] // SQ_SIZE
                     col = location[0] // SQ_SIZE
                     if sq_selected == (row, col) or col >= 8:
@@ -75,7 +76,26 @@ def main():
                     move_made = False
                     animate = False
                     game_over = False
-
+                elif e.key == pygame.K_w:
+                    gs = engine.gamestate()
+                    valid_moves = gs.get_valid_moves()
+                    sq_selected = ()
+                    player_clicks = []
+                    move_made = False
+                    animate = False
+                    game_over = False
+                    player_one = True
+                    player_two = False
+                elif e.key == pygame.K_b:
+                    gs = engine.gamestate()
+                    valid_moves = gs.get_valid_moves()
+                    sq_selected = ()
+                    player_clicks = []
+                    move_made = False
+                    animate = False
+                    game_over = False
+                    player_two = True
+                    player_one = False
         # AI move finder
         if not game_over and not human_turn:
             AI_Move = ai.find_best_move(gs, valid_moves)
