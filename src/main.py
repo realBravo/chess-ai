@@ -126,7 +126,7 @@ def main():
             animate = False
 
         draw_game_state(screen, gs, valid_moves, sq_selected, move_log_font)
-        
+
         if gs.checkmate or gs.stalemate:
             game_over = True
             text = "Stalemate" if gs.stalemate else "Black Wins by Checkmate!" if gs.white_to_move else "White Wins by Checkmate!"

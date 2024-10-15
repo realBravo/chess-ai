@@ -387,6 +387,7 @@ class Move():
                 return self.cols_to_files[self.start_col] + "x" + end_sq
             else:
                 return end_sq
+
         # TODO: pawn promotions
 
         # TODO: two of the same pieces can move to the same sqaure 
@@ -404,3 +405,4 @@ class Move():
 
     def get_rank_file(self, r, c):
         return self.cols_to_files[c] + self.rows_to_ranks[r]
+
