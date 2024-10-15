@@ -171,12 +171,15 @@ def draw_pieces(screen, board):
             if piece != '--':
                 screen.blit(IMAGES[piece], pygame.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-# TODO: fix reseting move log to empty
 def draw_move_log(screen, gs, font):
     move_log_rect = pygame.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
     pygame.draw.rect(screen, pygame.Color('black'), move_log_rect)
     move_log = gs.move_log
     move_texts = []
+
+    # reset move log hack
+    if len(move_log) > 87:
+        move_log.clear()
 
     for i in range(0, len(move_log), 2):
         move_string = str(i // 2 + 1) + ". " + str(move_log[i]) + " "
@@ -201,12 +204,6 @@ def draw_move_log(screen, gs, font):
         text_location = move_log_rect.move(padding, text_y)
         screen.blit(text_object, text_location.move(2, 2))
         text_y += text_object.get_height() + line_spacing
-
-    # reset move log hack
-   # if len(move_log) > 10:
-   #     move_log = []
-   #     pygame.draw.rect(screen, pygame.Color('black'), move_log_rect)
-   #     print(len(move_log))
 
 def animate_move(move, screen, board, clock):
     global colors
