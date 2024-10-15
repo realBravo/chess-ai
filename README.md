@@ -1,6 +1,6 @@
 # chess-ai
 
-# to run game type command in terminal while in src directory:
+# to run game type this command in terminal while in src directory:
 ```
 python main.py
 ```
